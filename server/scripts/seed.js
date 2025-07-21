@@ -8,9 +8,6 @@ const connectDB = async () => {
     try{
         await mongoose.connect(process.env.MONGO_URI)
         console.log("Connected to Database")
-        if (process.env.NODE_ENV !== "production") {
-        await Promise.all([User.deleteMany(), Product.deleteMany()]);
-  }
     }       
     catch(err){
         console.error("Failed to connect to Database", err);
