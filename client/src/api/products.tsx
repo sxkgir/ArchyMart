@@ -18,6 +18,74 @@
     dateRemoved?: string;
     }
 
+    export interface CartItem extends Product {
+    qty: number;
+    sizeID: number;
+    totalPrice: number;
+    }
+
+    export interface Size {
+        sizeID: number;
+        size: string;
+        sizeXInch: number;
+        sizeYInch: number;
+    }
+
+    export const sizes: Size[] = [
+        {
+            sizeID: 1,
+            size: '18" x 24"',
+            sizeXInch: 18,
+            sizeYInch: 24,
+        },
+        {
+            sizeID: 2,
+            size: '24"x48" | 2ftx4ft',
+            sizeXInch: 24,
+            sizeYInch: 48,
+        },
+        {
+            sizeID: 3,
+            size: '48"x96" | 4ftx8ft',
+            sizeXInch: 48,
+            sizeYInch: 96,
+        },
+        {
+            sizeID: 4,
+            size: '48"x48" | 4ftx4ft',
+            sizeXInch: 48,
+            sizeYInch: 48,
+        },
+        {
+            sizeID: 5,
+            size: 'Sqr. Foot |1ftx1ft',
+            sizeXInch: 12,
+            sizeYInch: 12,
+        },
+        {
+            sizeID: 6,
+            size: '24"x96"| 2ftx8ft',
+            sizeXInch: 24,
+            sizeYInch: 96,
+        },
+        {
+            sizeID: 7,
+            size: '24"x24"| 2ftx2ft',
+            sizeXInch: 24,
+            sizeYInch: 24,
+        },
+        {
+            sizeID: 8,
+            size: '12"x12"| 1ftx1ft',
+            sizeXInch: 12,
+            sizeYInch: 12,
+        },
+    ];
+
+    
+
+
+
     export const productApi = {
 
         getAll : async(): Promise<Product[]> => {
