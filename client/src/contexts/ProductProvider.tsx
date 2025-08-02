@@ -1,8 +1,9 @@
 import { createContext, useContext, useEffect, useState, ReactNode,Dispatch, SetStateAction } from "react";
-import { productApi } from "../api/products";
-import type { Product } from "../api/products";
+import { productApi } from "../api/productsApi";
+import type { Product } from "../api/productsApi";
 interface ProductContextType{
     getAllProducts: () => Promise<Product[]>
+    checkAuthType: () => Promise<String>
 }
 
 const ProductContext = createContext<ProductContextType | undefined>(undefined);
@@ -30,6 +31,8 @@ export function ProductProvider({children} : {children: ReactNode}) {
             {children}
         </ProductContext.Provider>
     )
+
+
 }
 
 export function useProductContext(){
@@ -39,3 +42,4 @@ export function useProductContext(){
     }
     return context; 
 }
+

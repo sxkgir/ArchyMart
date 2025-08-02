@@ -46,9 +46,10 @@
         },
         {
             sizeID: 3,
-            size: '48"x96" | 4ftx8ft',
-            sizeXInch: 48,
-            sizeYInch: 96,
+            size: '12"x48" | 1ftx4ft',
+            sizeXInch: 12,
+            sizeYInch: 48,
+
         },
         {
             sizeID: 4,
@@ -74,12 +75,13 @@
             sizeXInch: 24,
             sizeYInch: 24,
         },
+        
         {
             sizeID: 8,
-            size: '12"x12"| 1ftx1ft',
-            sizeXInch: 12,
-            sizeYInch: 12,
-        },
+            size: '24"36" | 2ftx3ft',
+            sizeXInch: 24,
+            sizeYInch: 36,
+        }
     ];
 
     

@@ -3,11 +3,12 @@ import { useEffect, useState } from "react"
 import Search from "../assets/Search.svg?react"
 import Load from "../assets/Load.svg?react"
 import { useProductContext } from "../contexts/ProductProvider";
-import type { Product } from "../api/products";
+import type { Product } from "../api/productsApi";
 import AddToCartButton from "./AddtoCart"; 
-import type { CartItem } from "../api/products";
+import OrderSentModal from "./ConfirmationModal";
+import type { CartItem } from "../api/productsApi";
 import SizeDropdown from "./SizeDropDown";
-import { sizes } from "../api/products";
+import { sizes } from "../api/productsApi";
 export function OrderContent(){
     const [searchInput, setSearchInput] = useState("");
     const { getAllProducts } = useProductContext();
@@ -16,19 +17,27 @@ export function OrderContent(){
     const [error, setError] = useState<Error | null>(null);    
     const [activeHoverProductID, setActiveHoverProductID] = useState("");  
     const [cartItems,setCartItems] = useState<CartItem[]>([]);
+    const [orderSent, setOrderSent] = useState(false);
+
+
+
 
     //calculates total price of cartItem
     useEffect(() => {
+
         const updated = cartItems.map((item) =>{
-            if (item.sizeID !== null){
-                console.log("hi");
+            if (item.sizeID !== null && !item.singleItem){
                 const sizeObj = sizes.find(obj => obj.sizeID === item.sizeID);
                 if (!sizeObj)
                     return item;
-                const priceCalculation = Number(((((sizeObj.sizeXInch * sizeObj.sizeYInch) / 144)/ item.sqrFeet) * item.price) * item.qty).toFixed(3);
 
+                
+                const priceCalculation = Number(((sizeObj.sizeXInch * sizeObj.sizeYInch) / 144)*(item.price / item.sqrFeet)).toFixed(2);
+                console.log(priceCalculation);
+                console.log(sizeObj.sizeXInch,sizeObj.sizeYInch)
                 return {...item, totalPrice: priceCalculation};
             }
+
             return item //returns the array of cartItems if it sizeID is null
         })
         const hasChanges = updated.some((u, i) => u !== cartItems[i]);
@@ -37,8 +46,12 @@ export function OrderContent(){
             setCartItems(updated);
         }
 
-    },[JSON.stringify(cartItems.map(i => ({ id: i.productID, sizeID: i.sizeID, quantity: i.qty }))),])
+    },[JSON.stringify(cartItems.map(i => ({ id: i.productID, sizeID: i.sizeID, quantity: i.qty, total: i.totalPrice }))),])
 
+    //cartReady is always in sync, because it's derived directly from the current state
+    const cartReady = cartItems.length > 0 && cartItems.every(item =>
+    item.singleItem || (item.totalPrice !== undefined)
+    );
 
     const handleAddCart = () => {
         if (!activeHoverProductID) return;                  
@@ -77,11 +90,16 @@ export function OrderContent(){
     })();                      
     }, [getAllProducts]);
 
-    const filtered = items.filter((item) => item.productName.toLowerCase().includes(searchInput.toLowerCase()))
+    const filtered = items.filter((item) => item.availability && 
+                                            item.productName.toLowerCase().includes(searchInput.toLowerCase()))
 
+    console.log(items.map((p) => p.productName))
+    useEffect(()=> {console.log(orderSent)},[orderSent])
 
     return( 
-        <div className="flex gap-[6%] pt-[5%]">
+        <div className="flex gap-[6%] pt-[5%] ">        
+            {<OrderSentModal isOpen={orderSent} onClose={() => {setCartItems([]), setOrderSent(false)}}/>}
+
             <div className=" pl-[3%] flex flex-col items-center w-[41%]">
                 <div className="relative w-[60%]"> {/* controls total width */}
                     <input
@@ -117,7 +135,7 @@ export function OrderContent(){
                 
             </div>
 
-            <div className="border-2 rounded-3xl w-[85%] flex-col justify-center items-center">
+            <div className="border-2 rounded-3xl w-[85%] flex-col justify-center items-center ">
                 <p className="text-center font-extrabold text-[20px] mb-[3%]">
                     Shopping Cart
                 </p>
@@ -130,7 +148,7 @@ export function OrderContent(){
                    <p className="basis-[11%] pl-[3%]">Total</p>
                  
                 </div>
-                <div className={"border-t-black border-t-2 overflow-y-auto w-[100%] h-[450px] mt-[1%] " + (loading ? " flex items-center justify-center" : "")} >
+                <div className={"border-t-black border-t-2 overflow-y-auto w-[100%] h-[70%] mt-[1%] pb-[2%]" + (loading ? " flex items-center justify-center" : "")} >
                     {loading && <Load className="w-35 h-35 " />}
                     
                     {!loading && !error && cartItems.map((c) => ( 
@@ -138,11 +156,11 @@ export function OrderContent(){
                         key={c.productID}
                         className={`ml-4 mt-4 w-full text-[14px] flex `}
                         >
-                        <p className="basis-[40%] "> {c.productName} </p>
+                        <p className="basis-[41%] "> {c.productName} </p>
                         <p className="basis-[15%]"> {c.categoryName} </p>
-                        <p className="basis-[8%]"> {c.price} </p>
+                        <p className="basis-[8%]"> ${c.price} </p>
                         <div className="basis-[16%] shrink-0">
-                            {c.categoryName === "4X8 Sheet good" && <SizeDropdown selectedID={c.sizeID ?? null} onChange={(newID) => {
+                            {c.categoryName === "Sheet good" && <SizeDropdown selectedID={c.sizeID ?? null} onChange={(newID) => {
                                 setCartItems((prev) =>
                                     prev.map((item) => item.productID === c.productID ? {...item, sizeID: newID} : item)
                                 )
@@ -168,8 +186,7 @@ export function OrderContent(){
 
                         </div>        
                             <p className="basis-[11%] pl-[2%]"> 
-                                {c.categoryName === "Single Each" ? c.price *c.qty : c.totalPrice} 
-                                
+                                ${c.categoryName === "Single Each" ? Number(c.price *c.qty).toFixed(2) : c.totalPrice} 
                             </p>
 
                         </div>
@@ -182,6 +199,23 @@ export function OrderContent(){
                     )} 
                 </div>    
 
+                <div className="w-full flex justify-center">
+                    <button
+                    type="button"
+                    disabled={!cartReady}
+                    onClick={() => setOrderSent(true)}
+                    className="
+                        mt-5 bg-green-600 text-white
+                        font-semibold px-6 py-3 rounded-lg
+                        hover:bg-green-700
+                        active:bg-green-800
+                        disabled:bg-gray-400 disabled:cursor-not-allowed
+                        transition
+                    "
+                    >
+                    Place Order
+                    </button>
+                </div>
 
                 
 
