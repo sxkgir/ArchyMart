@@ -3,7 +3,9 @@ import App from "../App"
 import { HomePage } from "../Pages/HomePage";
 import LoginPage from "../Pages/LoginPage";
 import StudentLoginPage from "../Pages/StudentLoginPage";
-
+import StaffLoginPage from "../Pages/StaffLoginPage";
+import AuthRoute from "../Auth/AuthRoute";
+import ProtectedRoute from "../Auth/ProtectedRoute";
 const routes = [
     {
         path: "",
@@ -11,15 +13,38 @@ const routes = [
         children: [
             {
                 path: "/",
-                element: <HomePage />
+                
+                element: (
+                    <ProtectedRoute>
+                        <HomePage />
+                    </ProtectedRoute>
+                )
             },
             {
                 path: "/login",
-                element: <LoginPage />
+                element: (
+                    <AuthRoute>
+                        <LoginPage />
+                    </AuthRoute>
+                )
             },
             {
                 path:"/login/student",
-                element: <StudentLoginPage />
+                element:(
+                    <AuthRoute>
+                        <StudentLoginPage />
+                    </AuthRoute>
+
+                )
+            },
+            {
+                path:"/login/staff",
+                element:(
+                    <AuthRoute>
+                        <StaffLoginPage />
+                    </AuthRoute>
+
+                )                
             }
         ]
     }

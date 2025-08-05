@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 require("dotenv").config();
 
 const Product = require("../models/Products");
-const User    = require("../models/Users");
+const User    = require("../models/Student");
 
 const connectDB = async () => {
     try{
