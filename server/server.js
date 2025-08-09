@@ -7,6 +7,7 @@ const app = express();
 const port = 3000;
 const Product = require("./models/Products");
 const UserEntryRoutes = require("./routes/UserEntryRoutes");
+const OrderRoutes = require("./routes/OrderRoutes")
 const passport = require("./strategies/LocalStrategy");
 
 app.use(express.json());
@@ -43,7 +44,10 @@ connectDB()
         console.error("Database connection failed. Server not started.", err);
     });
 
-app.use("/api",UserEntryRoutes)
+app.use("/api/auth",UserEntryRoutes)
+
+app.use("/api/orders",OrderRoutes)
+
 
 app.get("/api/products", async (req, res) => {
     try {

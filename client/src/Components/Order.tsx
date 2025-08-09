@@ -9,7 +9,11 @@ import OrderSentModal from "./ConfirmationModal";
 import type { CartItem } from "../api/productsApi";
 import SizeDropdown from "./SizeDropDown";
 import { sizes } from "../api/productsApi";
+import { useOrderContext } from "../contexts/OrderProvider";
+
+
 export function OrderContent(){
+    const {placeOrder} = useOrderContext();
     const [searchInput, setSearchInput] = useState("");
     const { getAllProducts } = useProductContext();
     const [items, setItems] = useState<Product[]>([]);            // local copy to render
@@ -17,12 +21,13 @@ export function OrderContent(){
     const [error, setError] = useState<Error | null>(null);    
     const [activeHoverProductID, setActiveHoverProductID] = useState("");  
     const [cartItems,setCartItems] = useState<CartItem[]>([]);
-    const [orderSent, setOrderSent] = useState(false);
+    const [orderSent, setOrderSent] = useState(false); 
+    const [totalCartPrice, setTotalCartPrice] = useState(0);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
 
 
-
-    //calculates total price of cartItem
+    //calculates total price of a cartItem not total cart
     useEffect(() => {
 
         const updated = cartItems.map((item) =>{
@@ -32,19 +37,31 @@ export function OrderContent(){
                     return item;
 
                 
-                const priceCalculation = Number(((sizeObj.sizeXInch * sizeObj.sizeYInch) / 144)*(item.price / item.sqrFeet)).toFixed(2);
+                const priceCalculation = Number(((((sizeObj.sizeXInch * sizeObj.sizeYInch) / 144)*(item.price / item.sqrFeet))*item.qty).toFixed(2));
                 console.log(priceCalculation);
-                console.log(sizeObj.sizeXInch,sizeObj.sizeYInch)
                 return {...item, totalPrice: priceCalculation};
             }
-
+            if (item.singleItem) {
+                return {
+                ...item,
+                totalPrice: Number((item.price * item.qty).toFixed(2))
+                };
+            }
+             
             return item //returns the array of cartItems if it sizeID is null
         })
+
         const hasChanges = updated.some((u, i) => u !== cartItems[i]);
 
         if (hasChanges) {
             setCartItems(updated);
         }
+
+        const total = updated.reduce((sum, item) => {
+            if (item.totalPrice === undefined || item.totalPrice === null) return sum;
+            return sum + item.totalPrice;
+        }, 0);
+        setTotalCartPrice(Number(total.toFixed(2)));
 
     },[JSON.stringify(cartItems.map(i => ({ id: i.productID, sizeID: i.sizeID, quantity: i.qty, total: i.totalPrice }))),])
 
@@ -73,6 +90,38 @@ export function OrderContent(){
 
     }
 
+    const handlePlaceOrder = async() =>{
+        try{
+            try{
+                setIsSubmitting(true);
+                await placeOrder(
+                //parameter destructuring. It extracts these properties from each cartItem object automatically. It
+                cartItems.map(({productID,productName,categoryName,qty,price,totalPrice})=>({
+                    productID,
+                    productName,
+                    unitPrice: price,
+                    category: categoryName,
+                    qty,
+                    totalPrice,
+                })),
+                totalCartPrice
+                );
+
+            }
+            finally{
+                setIsSubmitting(false);
+                setOrderSent(true);
+                setCartItems([]);
+            }
+
+        }
+        catch(error){
+            console.error("Order failed:", error);
+        }
+    }
+
+
+
     useEffect(() => {
     (async () => {              
         try{
@@ -97,7 +146,7 @@ export function OrderContent(){
     useEffect(()=> {console.log(orderSent)},[orderSent])
 
     return( 
-        <div className="flex gap-[6%] pt-[5%] ">        
+        <div className="flex gap-[6%] pt-[5%] items-center">        
             {<OrderSentModal isOpen={orderSent} onClose={() => {setCartItems([]), setOrderSent(false)}}/>}
 
             <div className=" pl-[3%] flex flex-col items-center w-[41%]">
@@ -135,7 +184,7 @@ export function OrderContent(){
                 
             </div>
 
-            <div className="border-2 rounded-3xl w-[85%] flex-col justify-center items-center ">
+            <div className="border-2 rounded-3xl w-[85%] h-[650px] flex flex-col ">
                 <p className="text-center font-extrabold text-[20px] mb-[3%]">
                     Shopping Cart
                 </p>
@@ -186,7 +235,7 @@ export function OrderContent(){
 
                         </div>        
                             <p className="basis-[11%] pl-[2%]"> 
-                                ${c.categoryName === "Single Each" ? Number(c.price *c.qty).toFixed(2) : c.totalPrice} 
+                                ${c.totalPrice} 
                             </p>
 
                         </div>
@@ -197,33 +246,32 @@ export function OrderContent(){
                             {error.message}
                         </p>
                     )} 
+
                 </div>    
+                    <div className="text-center">
+                        Total Price: ${totalCartPrice}
+                    </div>
 
-                <div className="w-full flex justify-center">
-                    <button
-                    type="button"
-                    disabled={!cartReady}
-                    onClick={() => setOrderSent(true)}
-                    className="
-                        mt-5 bg-green-600 text-white
-                        font-semibold px-6 py-3 rounded-lg
-                        hover:bg-green-700
-                        active:bg-green-800
-                        disabled:bg-gray-400 disabled:cursor-not-allowed
-                        transition
-                    "
-                    >
-                    Place Order
-                    </button>
-                </div>
+                    <div className="w-full flex justify-center">
+                        <button
+                        type="button"
+                        disabled={!cartReady || isSubmitting}
+                        onClick={handlePlaceOrder}
+                        className={`
+                            mt-5 flex items-center justify-center gap-2
+                            px-6 py-3 rounded-lg font-semibold transition
+                            disabled:bg-gray-400 disabled:cursor-not-allowed
+                            ${isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-green-600 hover:bg-green-700 active:bg-green-800"}
+                            text-white
+                        `}
+                        >
+                        {isSubmitting && <Load className="w-5 h-5 animate-spin" />}
+                        {isSubmitting ? "Placing Order..." : "Place Order"}
+                        </button>
+                    </div>
 
-                
 
             </div>
-
-
-
-
 
 
         </div>

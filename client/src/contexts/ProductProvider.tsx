@@ -4,6 +4,7 @@ import type { Product } from "../api/productsApi";
 interface ProductContextType{
     getAllProducts: () => Promise<Product[]>
     checkAuthType: () => Promise<String>
+
 }
 
 const ProductContext = createContext<ProductContextType | undefined>(undefined);
@@ -20,6 +21,7 @@ export function ProductProvider({children} : {children: ReactNode}) {
             return[];
         }
     }
+
 
 
 

@@ -21,7 +21,7 @@ export default function StudentLoginPage() {
 
   useEffect(() => {
     if (isLoggedIn) {
-      navigate("/", { replace: true });
+      navigate("/home", { replace: true });
     }
   }, [isLoggedIn, navigate]);
 

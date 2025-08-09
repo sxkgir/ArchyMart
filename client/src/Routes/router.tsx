@@ -13,19 +13,18 @@ const routes = [
         children: [
             {
                 path: "/",
-                
-                element: (
-                    <ProtectedRoute>
-                        <HomePage />
-                    </ProtectedRoute>
-                )
-            },
-            {
-                path: "/login",
                 element: (
                     <AuthRoute>
                         <LoginPage />
                     </AuthRoute>
+                )
+            },
+            {
+                path: "/home",
+                element: (
+                    <ProtectedRoute>
+                        <HomePage />
+                    </ProtectedRoute>
                 )
             },
             {

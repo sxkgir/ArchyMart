@@ -22,6 +22,6 @@ export default function ProtectedRoute({children} : {children : React.ReactEleme
 
 
     return(
-        isLoggedIn ? <>{children}</> : <Navigate to="/login" replace={true} />
+        isLoggedIn ? <>{children}</> : <Navigate to="/" replace={true} />
     )
 }

@@ -24,6 +24,6 @@ export default function AuthRoute({children} : {children : React.ReactElement}) 
     }
 
     return(
-        isLoggedIn ? <Navigate to="/" replace={true} />: <>{children}</> 
+        isLoggedIn ? <Navigate to="/home" replace={true} />: <>{children}</> 
     )
 }

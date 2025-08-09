@@ -4,12 +4,15 @@ import Profile from '../assets/Profile.svg?react'
 import Bar from '../assets/Bar.svg?react'
 import Chat from '../assets/Chat.svg?react'
 import Logo from '../assets/Logo.svg?react'
+import { useUserContext } from '../contexts/UserProvider'
 
 type Props = {
   onSelectSection: (section: string) => void;
 };
 
 export function LeftSideBar({ onSelectSection }: Props) {
+  const { role } = useUserContext();
+  console.log(role);
   return (
     <>
       <div className="h-[100%]">
@@ -17,23 +20,47 @@ export function LeftSideBar({ onSelectSection }: Props) {
           <Logo className="w-15 h-15" />
           ArchyMart  
         </div>
-
         <div className="flex flex-col h-[calc(100%-(80px))] bg-[#242730] pt-6 md:pt-4 lg:pt-5 text-[#5e6268] pl-[5%]">
-          <div
-            className="flex gap-[6%] py-[10%] items-center hover:text-white cursor-pointer"
-            onClick={() => onSelectSection("order")}
-          >
-            <CartIcon className="w-7 h-7" />
-            Order
-          </div>
 
-          <div
-            className="flex gap-[5%] py-[10%] items-center hover:text-white cursor-pointer"
-            onClick={() => onSelectSection("yourOrders")}
-          >
-            <Box className="w-7.5 h-7.5 fill-[#5e6268]" />
-            Your Orders
-          </div>
+          { role === "student" &&
+            <>
+              <div
+                className="flex gap-[6%] py-[10%] items-center hover:text-white cursor-pointer"
+                onClick={() => onSelectSection("order")}
+              >
+                <CartIcon className="w-7 h-7" />
+                Order
+              </div>
+
+              <div
+                className="flex gap-[5%] py-[10%] items-center hover:text-white cursor-pointer"
+                onClick={() => onSelectSection("yourOrders")}
+              >
+                <Box className="w-7.5 h-7.5 fill-[#5e6268]" />
+                Your Orders
+              </div>
+            </>
+          }
+          {
+            role === "staff" &&
+              <>
+                <div
+                  className="flex gap-[6%] py-[10%] items-center hover:text-white cursor-pointer"
+                  onClick={() => onSelectSection("products")}
+                >
+                  <CartIcon className="w-7 h-7" />
+                  Products
+                </div>
+
+                <div
+                  className="flex gap-[6%] py-[10%] items-center hover:text-white cursor-pointer"
+                  onClick={() => onSelectSection("manageOrder")}
+                >
+                  <CartIcon className="w-7 h-7" />
+                  Manage Order
+                </div>
+              </>
+          }
 
           <div
             className="flex gap-[5%] py-[10%] items-center hover:text-white cursor-pointer"

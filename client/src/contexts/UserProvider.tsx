@@ -79,6 +79,7 @@ export function UserProvider({children} : {children : ReactNode}){
             console.log(response);
             if(response.LoggedIn){
                 setIsLoggedIn(true);
+                setRole(response.user.role)
             }
             else{
                 setIsLoggedIn(false);

@@ -21,7 +21,7 @@ export default function StaffLoginPage() {
 
   useEffect(() => {
     if (isLoggedIn) {
-      navigate("/", { replace: true });
+      navigate("/home", { replace: true });
     }
   }, [isLoggedIn, navigate]);
 

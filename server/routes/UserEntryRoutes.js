@@ -5,7 +5,7 @@ const Student = require("../models/Student");
 const Staff = require("../models/Staff");
 
 //still required to check session is still verified etc
-router.post("/auth/student",(req,res,next) =>{
+router.post("/student",(req,res,next) =>{
     passport.authenticate("student", (err,student,info)  => { //custom call back if you have info in done(err,user,info) acces info
         if (err) return next(err); //actual error 500 teritory
         if(!student) return res.status(400).json({message : info.message});
@@ -18,7 +18,7 @@ router.post("/auth/student",(req,res,next) =>{
     })(req,res,next);
 });
 
-router.post("/auth/staff", (req,res,next)=>{
+router.post("/staff", (req,res,next)=>{
     passport.authenticate("staff", (err,staff,info) =>{
         if(err) return next(err);
         if(!staff) return res.status(400).json({message : info.message});
@@ -30,7 +30,7 @@ router.post("/auth/staff", (req,res,next)=>{
     })(req,res,next);
 })
 
-router.get("/auth/status", (req, res) => {
+router.get("/status", (req, res) => {
     console.log("Session in /auth/status:", req.session);
     console.log("User:", req.user);
     if (req.isAuthenticated() && req.session.isVerified) {
@@ -46,7 +46,7 @@ router.get("/auth/status", (req, res) => {
 });
 
 //this is if req.session.isverifeid is not intialized
-router.get("/auth/verify-email", async (req,res) => {
+router.get("/verify-email", async (req,res) => {
 
     const { token } = req.query
 
@@ -85,7 +85,7 @@ router.get("/auth/verify-email", async (req,res) => {
             if (err) return res.status(500).json({ message: "Login failed after verification" });
             req.session.isVerified = true;
             req.session.verifiedEmail = user.email;
-            return res.redirect("http://localhost:5173/?verified=1");;
+            return res.redirect("http://localhost:5173/home");;
         })
 
 
