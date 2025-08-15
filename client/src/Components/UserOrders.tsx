@@ -56,10 +56,39 @@ export function UserOrders(){
             </div>
             <div className="flex flex-col">
                 <div className="bg-[#efefef] rounded-2xl pl-[2%] basis-[8.3%]">
-                    Testing
+                    {loading && <p>Loading your orders...</p>}
+                    {!loading && data?.orders.length === 0 && <p>No orders found.</p>}
+
+                    {!loading && data && data.orders.map((order) => (
+                    <div key={order.orderID} className="bg-[#efefef] rounded-2xl pl-[2%] basis-[8.3%] flex items-center py-2 my-2">
+                        <p className="basis-[25%] truncate pr-2">{order.orderID}</p>
+                        <p className="basis-[15%]">{new Date(order.datePlaced).toLocaleDateString()}</p>
+                        <p className="basis-[20%]">{order.items.length}</p>
+                        <p className="basis-[20%]">${order.totalPrice.toFixed(2)}</p>
+                        <p className="basis-[10%]">{order.confirmed ? "Confirmed" : "Pending"}</p>
+                    </div>
+                    
+                    ))}               
                 </div>
 
             </div>
+            <div className="mt-4 flex gap-2">
+                <button
+                    disabled={page <= 1}
+                    onClick={() => setPage(page - 1)}
+                    className="bg-gray-300 px-4 py-1 rounded disabled:opacity-50"
+                >
+                    Prev
+                </button>
+                <span>Page {data?.page} of {data?.totalPgaes}</span>
+                <button
+                    disabled={data && page >= data.totalPgaes}
+                    onClick={() => setPage(page + 1)}
+                    className="bg-gray-300 px-4 py-1 rounded disabled:opacity-50"
+                >
+                    Next
+                </button>
+                </div>
 
 
         </div>
