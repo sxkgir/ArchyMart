@@ -15,7 +15,7 @@ interface PageData{
     orders: Order[];
     page: number;
     limit: number;
-    toatal: number;
+    total: number;
     totalPgaes: number;
 }
 

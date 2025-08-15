@@ -36,9 +36,32 @@ router.post("/create",ensureAuthenticated ,async(req,res) =>{
 
 router.get("/orders/mine",ensureAuthenticated ,async(req,res,next) => {
     try{
-        const userID = req.user._id;
+        const userID = req.user._id; 
         const page = Math.max(1, Number(req.query.page) || 1);
         const limit = 12;
+        const [total, orders] = await Promise.all([
+            Order.countDocuments({ orderedBy: userID }), //userID is alr a objectID
+            Order.find({orderedBy: userID})
+                .sort({datePlaced: -1})
+                .skip((page - 1 ) * limit)
+                .limit(limit)
+                .lean(),
+                
+        ])
+
+        if (page > totalPages) {
+        return res.status(400).json({
+            message: `Page ${page} does not exist. Total pages: ${totalPages}.`
+        });
+        }
+        
+        res.json({
+            orders,
+            page,
+            limit,
+            total,
+            totalPages: Math.max(1, Math.ceil(total / limit))
+        })
 
     }
     catch(err){
