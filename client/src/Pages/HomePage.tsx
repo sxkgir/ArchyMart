@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { LeftSideBar } from "../Components/Sidebar";
 import { OrderContent } from "../Components/Order";
-import { UserOrders } from "../Components/UserOrders";
 export function HomePage() {
     const [selectedSection, setSelectedSection] = useState("welcome");
 
@@ -11,7 +10,7 @@ export function HomePage() {
         case "order":
             return <OrderContent />;
         case "yourOrders":
-            return <UserOrders />;
+            return <div className="text-xl font-bold p-6">Your previous orders will appear here.</div>;
         case "profile":
             return <div className="text-xl font-bold p-6">Profile Information</div>;
         case "polls":

@@ -34,4 +34,16 @@ router.post("/create",ensureAuthenticated ,async(req,res) =>{
 
 })
 
+router.get("/orders/mine",ensureAuthenticated ,async(req,res,next) => {
+    try{
+        const userID = req.user._id;
+        const page = Math.max(1, Number(req.query.page) || 1);
+        const limit = 12;
+
+    }
+    catch(err){
+        console.log(err);
+    }
+})
+
 module.exports = router;
