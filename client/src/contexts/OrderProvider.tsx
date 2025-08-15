@@ -4,6 +4,7 @@ import type { ItemOrder } from "../api/orderApi";
 
 interface OrderContextType {
   placeOrder: (items: ItemOrder[], totalPrice: number) => Promise<void>;
+  getMyOrders: () => Promise<any>; 
 }
 
 const OrderContext = createContext<OrderContextType | undefined>(undefined);
@@ -14,8 +15,12 @@ export function OrderProvider({ children }: { children: ReactNode }) {
         await orderApi.createOrder({items,totalPrice})
     }
 
+    const getMyOrders = async () => {
+    return await orderApi.getMyOrders();
+  };
+
   return (
-    <OrderContext.Provider value={{ placeOrder }}>
+    <OrderContext.Provider value={{ placeOrder, getMyOrders }}>
       {children}
     </OrderContext.Provider>
   );

@@ -25,6 +25,21 @@ export function UserOrders(){
     const [page, setPage] = useState(1);
     const limit = 20;
 
+    useEffect(() => {
+    async function fetchOrders() {
+        try {
+        const response = await orderApi.getMyOrders();
+        setData(response);
+        } catch (error) {
+        console.error("Failed to fetch orders:", error);
+        } finally {
+        setLoading(false);
+        }
+    }
+
+    fetchOrders();
+    }, [page]);
+
     return(
         <div className="bg-[#ffffff] rounded-2xl p-4 h-full">
             <p className="text-2xl font-bold mb-8 font-mono ">My Orders</p>
