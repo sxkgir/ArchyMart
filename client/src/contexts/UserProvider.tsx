@@ -8,7 +8,6 @@ interface UserContextType{
     LoginStudent : (student : studentLogin) => Promise<void>;
     LoginStaff : (staffEmail : string) => Promise<void>;
     checkAuth: () => Promise<any>
-    signOut: () => Promise<any>
     isLoggedIn : boolean;
     role: string;
     errorMessage: string;
