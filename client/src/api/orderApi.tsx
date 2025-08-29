@@ -2,7 +2,6 @@ import axios from "axios";
 import qs from "qs"
 import type { Status } from "../Types/Order";
 import type { CreateOrderDTO } from "../Types/Order";
-import type { ItemOrder } from "../Types/Order";
 
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,

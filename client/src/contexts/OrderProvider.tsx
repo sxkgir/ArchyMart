@@ -1,4 +1,5 @@
-import { createContext, useContext, ReactNode } from "react";
+import { createContext, useContext } from "react";
+import type { ReactNode } from "react";
 import { orderApi } from "../api/orderApi";
 import type { ItemOrder } from "../Types/Order";
 import type { Status } from "../Types/Order";

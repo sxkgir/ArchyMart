@@ -1,4 +1,5 @@
-import { useState, KeyboardEvent, ChangeEvent, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
+import type { KeyboardEvent, ChangeEvent } from "react";
 import type { Status } from "../Types/Order";
 import Filter from "../assets/Filter.svg?react";
 import Search from "../assets/Search.svg?react";

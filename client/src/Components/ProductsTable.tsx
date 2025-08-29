@@ -115,10 +115,7 @@ export default function StaffProductsTable() {
         sqrFeet: values.sqrFeet,
         is3D: values.is3D,
       });
-      setProducts((prev) => {
-        const updated = [...prev, created];
-        return updated
-      });
+      if (created) setProducts(prev => [...prev, created]);
     }
 
     finally {
@@ -151,7 +148,7 @@ export default function StaffProductsTable() {
 
   return (
     <div className="mx-auto max-w-6xl p-4">
-      {showModal && <MessageModal message={message} onClose={() => closeModal()}/>}
+      {showModal && <MessageModal message={message} onClose={() => setShowModal(false)}/>}
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-xl font-bold">Products (Staff View)</h2>
         <div className="flex items-center gap-3">

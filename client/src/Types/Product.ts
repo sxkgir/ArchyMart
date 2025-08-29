@@ -13,7 +13,7 @@ dateRemoved?: string;
 
 export interface CartItem extends Product {
 qty: number;
-sizeID: number;
+sizeID: number | null;
 totalPrice: number;
 }
 

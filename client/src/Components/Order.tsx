@@ -5,7 +5,6 @@ import Load from "../assets/Load.svg?react"
 import { useProductContext } from "../contexts/ProductProvider";
 import type { Product } from "../Types/Product";
 import AddToCartButton from "./UI/AddtoCart"; 
-import OrderSentModal from "./UI/ConfirmationModal";
 import MessageModal from "./UI/MessageModal";
 import type { CartItem } from "../Types/Product";
 import SizeDropdown from "./UI/SizeDropDown";
@@ -90,25 +89,42 @@ export default function OrderContent(){
     item.singleItem || (item.totalPrice !== undefined)
     );
 
+    const buildCartItem = (p: Product): CartItem => ({
+        _id: Date.now(),                 // or any unique id you use
+        productID: p.productID,
+        productName: p.productName,
+        categoryName: p.categoryName,
+        price: p.price,
+        singleItem: p.singleItem,
+        availability: p.availability,
+        sqrFeet: p.sqrFeet,
+        qty: 1,
+        sizeID: null,                    // no size selected yet
+        totalPrice: p.singleItem ? p.price : 0 // effect will recalc later for sheet goods
+    });
+    
     const handleAddCart = () => {
-        if (!activeHoverProductID) return;                  
+        if (!activeHoverProductID) return;
 
         const product = items.find(p => p.productID === activeHoverProductID);
         if (!product) return;
-
+        
         setCartItems(prev => {
-            const existing = prev.find(c => c.productID === product.productID);
-            if (existing)   {
-                return prev.map( c =>
-                                 c.productID === product.productID
-                                 ? { ...c, qty: c.qty + 1 }     
-                                 : c)
+            const idx = prev.findIndex(c => c.productID === product.productID);
+            if (idx !== -1) {
+            // return a proper CartItem[] (no unions)
+            const next = [...prev];
+            const existing = next[idx];
+            const updated: CartItem = { ...existing, qty: existing.qty + 1 };
+            next[idx] = updated;
+            return next;
             }
-            return [...prev, { ...product, qty: 1 }]; // OK: CartItem
-        })
-        setActiveHoverProductID("");
+            // add a fully-typed CartItem
+            return [...prev, buildCartItem(product)];
+        });
 
-    }
+        setActiveHoverProductID("");
+    };
 
     const handlePlaceOrder = async() =>{
         try{

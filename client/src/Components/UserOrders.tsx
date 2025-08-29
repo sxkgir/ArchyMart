@@ -1,5 +1,4 @@
 import { useEffect,useState } from "react"
-import {type ItemOrder } from "../api/orderApi"
 import type { PageData } from "../Types/Order";
 import type { Status } from "../Types/Order";
 import type { Order } from "../Types/Order";
@@ -37,7 +36,7 @@ export default function UserOrders(){
         try {
             setLoading(true);
             // If your context supports params: getAllOrders({ page, q })
-            const response = await getMyOrders(q, page, statuses); 
+            const response = await getMyOrders(q, page, statuses, null);
             
             if (!isActive) return; // guard for update state on an unmounted component (or one whose effect has been replaced by a newer one).
             setData(response);

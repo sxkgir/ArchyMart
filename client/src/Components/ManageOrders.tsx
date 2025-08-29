@@ -30,7 +30,7 @@ export default function ManageOrders() {
         try {
             setLoading(true);
             // If your context supports params: getAllOrders({ page, q })
-            const response = await getAllOrders(q, page, statuses); 
+            const response = await getAllOrders(q, page, statuses, null);
             
             if (!isActive) return; // guard for update state on an unmounted component (or one whose effect has been replaced by a newer one).
             setData(response);

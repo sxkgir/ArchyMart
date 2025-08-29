@@ -1,4 +1,5 @@
-import { createContext, useContext, useEffect, useState, ReactNode,Dispatch, SetStateAction } from "react";
+import { createContext, useContext, useState } from "react";
+import type { ReactNode, Dispatch, SetStateAction } from "react";
 import { userApi } from "../api/userApi";
 import type { studentLogin } from "../Types/Credentials";
 
