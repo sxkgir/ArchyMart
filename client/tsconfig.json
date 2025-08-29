@@ -4,10 +4,12 @@
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
   ],
+  "extends": "./tsconfig.json",
   "compilerOptions": {
-    "skipLibCheck": true,
-    "types": ["vite/client"], 
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-  }
+    "skipLibCheck": true,
+    "types": ["vite/client"]
+  },
+  "include": ["src"]
 }
