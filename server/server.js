@@ -5,10 +5,12 @@ const session = require("express-session");
 const { connectDB } = require("./scripts/seed")
 const app = express();
 const port = 3000;
-const Product = require("./models/Products");
 const UserEntryRoutes = require("./routes/UserEntryRoutes");
 const OrderRoutes = require("./routes/OrderRoutes")
+const ProductRoutes = require("./routes/ProductRoutes")
 const passport = require("./strategies/LocalStrategy");
+const MongoStore = require("connect-mongo");
+const { ensureAuthenticated } = require("./middleware/authMiddleware")
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -24,6 +26,7 @@ app.use(
     session({
         secret: "ArchyMart Secret",
         saveUninitialized: false,  
+        store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
         resave:false,
         cookie: {
             maxAge: 80000 * 100,      
@@ -48,12 +51,4 @@ app.use("/api/auth",UserEntryRoutes)
 
 app.use("/api/orders",OrderRoutes)
 
-
-app.get("/api/products", async (req, res) => {
-    try {
-        const products = await Product.find({});
-        res.json(products);
-    } catch (err) {
-        res.status(500).json({ error: "Failed to fetch products" });
-    }
-});
+app.use("/api/products",ProductRoutes)

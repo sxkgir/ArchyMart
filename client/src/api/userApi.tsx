@@ -5,10 +5,7 @@ const axiosInstance = axios.create({
     withCredentials: true
 }); 
 
-export interface studentLogin{
-    email : string;
-    RIN : number;
-}
+
 
 export const userApi = {
 
@@ -42,6 +39,18 @@ export const userApi = {
             const response = (await axiosInstance.get("/api/auth/status")).data
             return response;
 
+        }
+        catch(error){
+            console.log("Error in finding session:",error);
+            throw error
+
+        }
+    },
+
+    logOut: async() => {
+        try{
+            const response = (await axiosInstance.post("/api/auth/logout")).data
+            return response;
         }
         catch(error){
             console.log("Error in finding session:",error);

@@ -4,13 +4,15 @@ import Profile from '../assets/Profile.svg?react'
 import Bar from '../assets/Bar.svg?react'
 import Chat from '../assets/Chat.svg?react'
 import Logo from '../assets/Logo.svg?react'
+import Paper from "../assets/Paper.svg?react"
+import Product from "../assets/Product.svg?react"
 import { useUserContext } from '../contexts/UserProvider'
 
 type Props = {
   onSelectSection: (section: string) => void;
 };
 
-export function LeftSideBar({ onSelectSection }: Props) {
+export default function LeftSideBar({ onSelectSection }: Props) {
   const { role } = useUserContext();
   console.log(role);
   return (
@@ -21,16 +23,15 @@ export function LeftSideBar({ onSelectSection }: Props) {
           ArchyMart  
         </div>
         <div className="flex flex-col h-[calc(100%-(80px))] bg-[#242730] pt-6 md:pt-4 lg:pt-5 text-[#5e6268] pl-[5%]">
-
-          { role === "student" &&
-            <>
-              <div
+            <div
                 className="flex gap-[6%] py-[10%] items-center hover:text-white cursor-pointer"
                 onClick={() => onSelectSection("order")}
               >
                 <CartIcon className="w-7 h-7" />
                 Order
-              </div>
+            </div>
+          { role === "student" &&
+            <>
 
               <div
                 className="flex gap-[5%] py-[10%] items-center hover:text-white cursor-pointer"
@@ -46,19 +47,20 @@ export function LeftSideBar({ onSelectSection }: Props) {
               <>
                 <div
                   className="flex gap-[6%] py-[10%] items-center hover:text-white cursor-pointer"
+                  onClick={() => onSelectSection("manageOrder")}
+                >
+                  <Paper className="w-7 h-7 fill-[#5e6268]" />
+                  Manage Order
+                </div>
+                <div
+                  className="flex gap-[6%] py-[10%] items-center hover:text-white cursor-pointer"
                   onClick={() => onSelectSection("products")}
                 >
-                  <CartIcon className="w-7 h-7" />
+                  <Product className="w-7 h-7 fill-[#5e6268]" />
                   Products
                 </div>
 
-                <div
-                  className="flex gap-[6%] py-[10%] items-center hover:text-white cursor-pointer"
-                  onClick={() => onSelectSection("manageOrder")}
-                >
-                  <CartIcon className="w-7 h-7" />
-                  Manage Order
-                </div>
+
               </>
           }
 

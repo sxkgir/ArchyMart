@@ -32,6 +32,7 @@ passport.use(
 
           const token = crypto.randomBytes(64).toString("hex");
           const expires = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+          console.log(token);
 
           await student.updateOne({
             $set:{
@@ -78,6 +79,8 @@ passport.use(
 
         const token = crypto.randomBytes(64).toString("hex");
         const expires = new Date(Date.now() + 15 *60 *1000);
+              console.log(token);
+
 
         await staff.updateOne({
           $set:{

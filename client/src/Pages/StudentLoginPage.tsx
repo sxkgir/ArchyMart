@@ -1,6 +1,8 @@
 import { useState,useEffect } from "react";
 import { useUserContext } from "../contexts/UserProvider";
 import { useNavigate } from "react-router-dom";
+import MessageModal from "../Components/UI/MessageModal";
+
 export default function StudentLoginPage() {
   const { LoginStudent,errorMessage, isLoggedIn, setErrorMessage,checkAuth,isPolling} = useUserContext();
   const [RIN, setRIN] = useState("");
@@ -119,31 +121,10 @@ export default function StudentLoginPage() {
       </form>
     </div>
       {showModal && (
-        <Modal message={modalMessage} onClose={() => {setShowModal(false);}} />
+        <MessageModal message={modalMessage} onClose={() => {setShowModal(false);}} />
       )}
     </>
 
   );
 }
 
-function Modal({
-  message,
-  onClose,
-}: {
-  message: string;
-  onClose: () => void;
-}) {
-  return (
-    <div className="fixed inset-0 bg-[#202225] bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 max-w-sm w-full shadow-lg">
-        <p className="text-gray-800 mb-4">{message}</p>
-        <button
-          onClick={onClose}
-          className="mt-2 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded"
-        >
-          OK
-        </button>
-      </div>
-    </div>
-  );
-}

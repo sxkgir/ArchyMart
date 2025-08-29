@@ -22,6 +22,7 @@ router.post("/staff", (req,res,next)=>{
     passport.authenticate("staff", (err,staff,info) =>{
         if(err) return next(err);
         if(!staff) return res.status(400).json({message : info.message});
+        if (staff.role !== "staff") return res.status(400).json({message: "Restricted access you are not a staff."})
 
         req.logIn(staff, err =>{
             if(err) return next(err);
@@ -36,9 +37,9 @@ router.get("/status", (req, res) => {
     if (req.isAuthenticated() && req.session.isVerified) {
         console.log(req.user.role);
         return res.json({
-        LoggedIn: true,
-        user: req.user,
-        role: req.user.role
+            LoggedIn: true,
+            user: req.user,
+            role: req.user.role
         });
     } else {
         return res.status(401).json({ LoggedIn: false });
@@ -94,6 +95,26 @@ router.get("/verify-email", async (req,res) => {
         console.error(error);
         return res.status(500).json({ message: "Server error during verification" });
     }
+})
+
+router.post("/logout", async(req,res,next) => {
+    req.logout(err => {
+    if (err) {return next(err)}
+        req.session.destroy(() => {
+        // clear the session cookie; name must match your express-session cookie
+        // default is "connect.sid"
+        res.clearCookie("connect.sid", {
+            path: "/",            // must match cookie settings in express-session
+            httpOnly: true,
+            sameSite: "lax",
+            secure: false,        // set true if you're on HTTPS
+        });
+        return res.status(200).json({ success: true });
+
+        })
+
+    })
+
 })
 
 module.exports = router;

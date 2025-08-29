@@ -1,5 +1,5 @@
 // SizeDropdown.tsx
-import { sizes } from "../api/productsApi";
+import { sizes } from "../../api/productsApi";
 
 interface SizeDropdownProps {
   selectedID: number | null;

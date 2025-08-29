@@ -1,6 +1,6 @@
 // AddToCartButton.tsx
 import type { MouseEventHandler } from "react";
-import CartCheckout from "../assets/Cart.svg?react"
+import CartCheckout from "../../assets/Cart.svg?react"
 
 interface AddToCartButtonProps {
   onClick?: MouseEventHandler<HTMLButtonElement>;

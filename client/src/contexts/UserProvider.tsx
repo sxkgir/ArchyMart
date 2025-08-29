@@ -1,11 +1,12 @@
 import { createContext, useContext, useEffect, useState, ReactNode,Dispatch, SetStateAction } from "react";
 import { userApi } from "../api/userApi";
-import type { studentLogin } from "../api/userApi";
+import type { studentLogin } from "../Types/Credentials";
+
 
 interface UserContextType{
     LoginStudent : (student : studentLogin) => Promise<void>;
     LoginStaff : (staffEmail : string) => Promise<void>;
-    checkAuth: () => Promise<void>
+    checkAuth: () => Promise<any>
     isLoggedIn : boolean;
     role: string;
     errorMessage: string;
@@ -80,6 +81,7 @@ export function UserProvider({children} : {children : ReactNode}){
             if(response.LoggedIn){
                 setIsLoggedIn(true);
                 setRole(response.user.role)
+                return response;
             }
             else{
                 setIsLoggedIn(false);

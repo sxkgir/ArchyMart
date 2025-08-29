@@ -1,37 +1,51 @@
 import axios from "axios";
+import qs from "qs"
+import type { Status } from "../Types/Order";
+import type { CreateOrderDTO } from "../Types/Order";
+import type { ItemOrder } from "../Types/Order";
 
 const axiosInstance = axios.create({
   baseURL: "http://localhost:3000/",
   withCredentials: true,
 });
 
-export interface ItemOrder {
-  productID: string;
-  productName: string;
-  category:string;
-  qty: number;
-  unitPrice: number;
-  totalPrice: number;
-}
 
-export interface CreateOrderDTO{
-    items: ItemOrder[];
-    totalPrice: number;
-}
 
 export const orderApi = {
 
-    createOrder : async(orderData : CreateOrderDTO) => {
-        const response = (await axiosInstance.post("/api/orders/create",orderData)).data
+    createOrder : async(orderData : CreateOrderDTO,studentRIN : number, formID: string | "" ) => {
+        const response = (await axiosInstance.post("/api/orders/create",{orderData, studentRIN, formID})).data
         return response
     },
 
-    getMyOrders : async() =>{
-        const response = (await axiosInstance.get("/api/orders/my")).data
-        return response;
-    }
+    getMyOrders : async( q: string | "",page: number, status: Status[] | null, formID: string | null) =>{
+        const response = (await axiosInstance.get("/api/orders/my",{
+        params: {q, page, status},
+        paramsSerializer: params => qs.stringify(params, { arrayFormat: "repeat" }),
+        // produces: ?status=pending&status=confirmed
+      })).data
+      return response;
+    },
     
+    //only staff can access
+    getAllOrders : async(q: string | "", page: number, status: Status[] | null, formID: string | null) => {
+      const response = (await axiosInstance.get("/api/orders/all", {
+        params: {q, page, status},
+        paramsSerializer: params => qs.stringify(params, { arrayFormat: "repeat" }),
+        // produces: ?status=pending&status=confirmed
+      })).data
+      return response;
+    },
 
+    handleOrderDecision : async(orderID : string, action: "confirmed" | "denied" | "pick-up" | "student-accepted" | "canceled") =>{
+      const response = (await axiosInstance.post(`/api/orders/${orderID}/decision`, {action})).data
+      return response;
+    },
+
+    getWeeklyReport : async() =>{
+      const response = (await axiosInstance.get('/api/orders/week/report')).data
+      return response;
+    }
 
 
 }
