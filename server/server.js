@@ -15,10 +15,15 @@ const { ensureAuthenticated } = require("./middleware/authMiddleware")
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+const ORIGIN =
+  process.env.NODE_ENV === "production"
+    ? "https://archymart.cs.rpi.edu"
+    : "http://localhost:5173";
+
 app.use(
     cors({
-    origin: 'http://localhost:5173',
-    credentials: true,
+        origin: ORIGIN,
+        credentials: true,
     })
 );
 
@@ -29,7 +34,8 @@ app.use(
         store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
         resave:false,
         cookie: {
-            maxAge: 80000 * 100,      
+            maxAge: 80000 * 100,   
+            httpOnly: true,   
         },
     })
 )
