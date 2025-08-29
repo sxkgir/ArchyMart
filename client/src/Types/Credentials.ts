@@ -3,7 +3,7 @@ export interface studentLogin{
     RIN : number;
 }
 
-export type UserInfo{
+export type UserInfo = {
     firstName: string;
     lastName: string;
     RIN?: string;
