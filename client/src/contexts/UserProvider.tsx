@@ -7,6 +7,7 @@ interface UserContextType{
     LoginStudent : (student : studentLogin) => Promise<void>;
     LoginStaff : (staffEmail : string) => Promise<void>;
     checkAuth: () => Promise<any>
+    signOut: () => Promise<any>
     isLoggedIn : boolean;
     role: string;
     errorMessage: string;
@@ -52,6 +53,7 @@ export function UserProvider({children} : {children : ReactNode}){
 
     const LoginStaff = async(staffEmail : string) =>{
         try{
+            console.log("HERE",import.meta.env.VITE_API_BASE_URL)
             await userApi.LogInStaff(staffEmail);
             console.log("Found Staff");
             setIsLoggedIn(true);

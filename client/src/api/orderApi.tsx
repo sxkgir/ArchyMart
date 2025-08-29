@@ -5,9 +5,10 @@ import type { CreateOrderDTO } from "../Types/Order";
 import type { ItemOrder } from "../Types/Order";
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:3000/",
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   withCredentials: true,
 });
+
 
 
 

@@ -23,3 +23,4 @@ export interface Size {
     sizeXInch: number;
     sizeYInch: number;
 }
+
