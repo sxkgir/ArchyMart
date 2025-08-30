@@ -1,9 +1,6 @@
 const mongoose = require("mongoose");
 require("dotenv").config();
 
-const Product = require("../models/Products");
-const User    = require("../models/Student");
-
 const connectDB = async () => {
     try{
         await mongoose.connect(process.env.MONGO_URI)
@@ -15,7 +12,6 @@ const connectDB = async () => {
 
     }
 }
-
 
 
 module.exports = {
