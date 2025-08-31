@@ -86,7 +86,7 @@ router.get("/verify-email", async (req,res) => {
             if (err) return res.status(500).json({ message: "Login failed after verification" });
             let URL = "";
             if(process.env.NODE_ENV === "production"){
-                URL = process.BASE_URL;
+                URL = process.env.BASE_URL;
             }
             else{
                 URL = "http://localhost:5174"
