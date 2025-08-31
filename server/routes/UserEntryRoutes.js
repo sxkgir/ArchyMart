@@ -84,9 +84,16 @@ router.get("/verify-email", async (req,res) => {
         
         req.logIn(user, err=>{
             if (err) return res.status(500).json({ message: "Login failed after verification" });
+            let URL = "";
+            if(process.env.NODE_ENV === "production"){
+                URL = process.BASE_URL;
+            }
+            else{
+                URL = "http://localhost:5174"
+            }
             req.session.isVerified = true;
             req.session.verifiedEmail = user.email;
-            return res.redirect("http://localhost:5173/home");;
+            return res.redirect(`${URL}/home`);;
         })
 
 

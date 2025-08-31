@@ -130,9 +130,9 @@ async function sendVerificationEmail(user, token) {
     baseURL = process.env.BASE_URL
   }
   else{
-    baseURL = "http://localhost:3000";
+    baseURL = "http://localhost:5174";
   }
-  const verifyUrl = `${baseURL}/auth/verify-email?token=${token}`;
+  const verifyUrl = `${baseURL}/api/auth/verify-email?token=${token}`;
 
   const transporter = nodemailer.createTransport({
     service: "gmail",
