@@ -253,7 +253,7 @@ export default function OrderContent(){
                         {!loading && !error && filtered.map((p) => ( 
                             <button
                             key={p.productID}
-                            className={`p-2 px-4 block hover:cursor-pointer hover:bg-gray-400 w-full flex
+                            className={`p-2 px-4 hover:cursor-pointer hover:bg-gray-400 w-full flex text-[0.9rem]
                             ${activeHoverProductID == p.productID ? "bg-gray-400" : ""}` } 
                             onClick={() => setActiveHoverProductID(p.productID)} 
                             >
@@ -273,17 +273,16 @@ export default function OrderContent(){
                 </div>
 
                 <div className="border-2 rounded-3xl w-[85%] h-[650px] flex flex-col ">
-                    <p className="text-center font-extrabold text-[20px] mb-[3%]">
-                        Shopping Cart
-                    </p>
-                    <div className="flex pl-4 text-gray-500 font-bold text-[14px]">
-                    <p className="basis-[45%] ">Product</p>
-                    <p className="basis-[15%]">Category</p>
-                    <p className="basis-[14%]">Price</p>
-                    <p className="basis-[12%]">Size</p>
-                    <p className="basis-[10%] pl-[5%]">Qty</p>
-                    <p className="basis-[11%] pl-[3%]">Total</p>
-                    
+                    <p className="text-center font-extrabold text-xl mb-3">Shopping Cart</p>
+                    <div className="grid grid-cols-[1.8fr_0.9fr_0.6fr_0.9fr_0.7fr_0.7fr_40px] 
+                                    items-center pl-4 pr-4 text-gray-500 font-bold text-[0.9rem] gap-2">
+                        <p>Product</p>
+                        <p>Category</p>
+                        <p>Price</p>
+                        <p>Size</p>
+                        <p className="text-center">Qty</p>
+                        <p className="text-center">Total</p>
+                        <p className="text-center">Action </p> {}
                     </div>
                     <div className={"border-t-black border-t-2 overflow-y-auto w-[100%] h-[70%] mt-[1%] pb-[2%]" + (loading ? " flex items-center justify-center" : "")} >
                         {loading && <Load className="w-35 h-35 " />}
@@ -291,42 +290,60 @@ export default function OrderContent(){
                         {!loading && !error && cartItems.map((c) => ( 
                             <div
                             key={c.productID}
-                            className={`ml-4 mt-4 w-full text-[14px] flex `}
+                            className="grid grid-cols-[1.8fr_0.9fr_0.6fr_0.9fr_0.7fr_0.7fr_40px]
+                                        items-center gap-2 pl-4 pr-4 mt-3 text-[0.9rem]"
                             >
-                            <p className="basis-[41%] "> {c.productName} </p>
-                            <p className="basis-[15%]"> {c.categoryName} </p>
-                            <p className="basis-[8%]"> ${c.price} </p>
-                            <div className="basis-[16%] shrink-0">
-                                {c.categoryName === "Sheet good" && <SizeDropdown selectedID={c.sizeID ?? null} onChange={(newID) => {
-                                    setCartItems((prev) =>
-                                        prev.map((item) => item.productID === c.productID ? {...item, sizeID: newID} : item)
-                                    )
-                                }}/>}
-                            </div>
-                            <div className="basis-[10%] flex items-center gap-1 pl-[3%]">
-                                <input
+                                <p className="truncate">{c.productName}</p>
+                                <p className="truncate">{c.categoryName}</p>
+                                <p>${c.price}</p>
+
+                                <div className="min-w-0">
+                                    {c.categoryName === "Sheet good" && (
+                                    <SizeDropdown
+                                        selectedID={c.sizeID ?? null}
+                                        onChange={(newID) => {
+                                        setCartItems(prev =>
+                                            prev.map(item =>
+                                            item.productID === c.productID ? { ...item, sizeID: newID } : item
+                                            )
+                                        );
+                                        }}
+                                    />
+                                    )}
+                                </div>
+
+                                <div className="flex items-center justify-center">
+                                    <input
                                     type="number"
                                     min={1}
                                     value={c.qty}
                                     onChange={(e) => {
                                         const newQty = Math.max(1, parseInt(e.target.value) || 1);
                                         setCartItems(prev =>
-                                            prev.map(item =>
-                                                item.productID === c.productID
-                                                    ? { ...item, qty: newQty }
-                                                    : item
-                                            )
+                                        prev.map(item =>
+                                            item.productID === c.productID ? { ...item, qty: newQty } : item
+                                        )
                                         );
                                     }}
                                     className="w-12 text-center border rounded"
-                                />
+                                    />
+                                </div>
 
-                            </div>        
-                                <p className="basis-[11%] pl-[2%]"> 
-                                    ${c.totalPrice} 
-                                </p>
-
+                                <p className="text-center">${c.totalPrice}</p>
+                                {/* Actions column */}
+                                <button
+                                    type="button"
+                                    aria-label={`Remove ${c.productName}`}
+                                    onClick={() =>
+                                    setCartItems(prev => prev.filter(item => item.productID !== c.productID))
+                                    }
+                                    className="h-8 w-8 rounded-md border hover:bg-red-600 hover:text-white 
+                                            flex items-center justify-center"
+                                >
+                                    ✕
+                                </button>
                             </div>
+                            
                         ))}
                         
                         {!loading && error && (

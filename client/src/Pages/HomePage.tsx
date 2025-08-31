@@ -30,35 +30,35 @@ export function HomePage() {
         }
     };
 
-    return(
-    <>
-        <div className="flex">
-            <div className="lg:max-w-[270px] md:max-w-[200px] sm:max-w-[150px]">
-                <LeftSideBar onSelectSection={setSelectedSection}/>
-            </div>
-            <div className="flex flex-col w-[100%] h-screen">
-                <div className="flex items-center h-[80px] bg-[#f4f4f461] w-[100%] pl-[2.5%] text-[#484848c3] text-[20px] font-bold">
-                    {{
-                    welcome: "Home",
-                    order: "Order",
-                    yourOrders: "Your Orders",
-                    manageOrder: "Manage Orders",
-                    products: "Manage Products",
-                    profile: "My Profile",
-                    polls: "Polls",
-                    contact: "Contact",
+  const title =
+    {
+      welcome: "Home",
+      order: "Order",
+      yourOrders: "Your Orders",
+      manageOrder: "Manage Orders",
+      products: "Manage Products",
+      profile: "My Profile",
+      polls: "Polls",
+      contact: "Contact",
+    }[selectedSection] ?? "";
 
-                    }[selectedSection] ?? ""}
-                </div>
-                <div className="bg-[#efefef] h-[calc(100%-(80px))] p-[2%]">
-                    <div className={""}>
-                        {renderContent()}
-                    </div>
-                        
-                </div>
+  return (
+    <div className="flex min-h-screen w-full bg-[#efefef]">
+      <aside className="shrink-0 w-56 md:w-64 lg:w-72 border-r border-black/5 bg-white">
+        <LeftSideBar onSelectSection={setSelectedSection} />
+      </aside>
 
-            </div>
-        </div>
-    </>
-    )
+      <main className="flex-1 min-w-0 flex flex-col">
+        <header className="top-0 z-10 h-20 flex items-center bg-[#f4f4f461] text-[#484848c3] font-bold px-4 md:px-6">
+          <h1 className="text-lg md:text-xl bg-[#f4f4f461]">{title}</h1>
+        </header>
+
+        <section className="flex-1 overflow-y-auto bg-[#ffffff]">
+          <div className="mx-auto w-full max-w-7xl px-4 md:px-6 py-4 ">
+            {renderContent()}
+          </div>
+        </section>
+      </main>
+    </div>
+  );
 }

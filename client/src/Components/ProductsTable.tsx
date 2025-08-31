@@ -147,7 +147,7 @@ export default function StaffProductsTable() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl p-4">
+    <div className="mx-auto max-w-6xl p-4 max">
       {showModal && <MessageModal message={message} onClose={() => setShowModal(false)}/>}
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-xl font-bold">Products (Staff View)</h2>

@@ -18,9 +18,9 @@ export default function LeftSideBar({ onSelectSection }: Props) {
   return (
     <>
       <div className="h-[100%]">
-        <div className="flex p-[10px] items-center gap-[10px] font-extrabold text-[max(2vw,3px)] justify-center">
-          <Logo className="w-15 h-15" />
-          ArchyMart  
+        <div className="flex items-center justify-start gap-3 p-3 font-extrabold ml-3">
+          <Logo className="size-10 md:size-12 lg:size-14 shrink-0" />
+          <span className="text-lg md:text-xl lg:text-2xl leading-none">ArchyMart</span>
         </div>
         <div className="flex flex-col h-[calc(100%-(80px))] bg-[#242730] pt-6 md:pt-4 lg:pt-5 text-[#5e6268] pl-[5%]">
             <div

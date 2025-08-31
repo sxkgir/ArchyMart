@@ -5,10 +5,10 @@ import { Link } from 'react-router-dom';
 export default function LoginPage() {
   return (
     <div className="min-h-screen bg-[#202225] flex items-center justify-center p-4">
-      <div className="bg-gray-800 text-white rounded-lg shadow-lg overflow-hidden max-w-31/100   w-full">
+      <div className="bg-gray-800 text-white rounded-2xl shadow-lg overflow-hidden w-full max-w-md md:max-w-lg min-w-[320px]">
         <div className="flex items-center justify-center bg-gray-900 p-6">
           
-          <Logo className="w-30 h-30" />    
+          <Logo className="size-16 md:size-20 lg:size-24 shrink-0" />    
 
           <h1 className="ml-3 text-4xl font-semibold">ArchyMart</h1>
         </div>

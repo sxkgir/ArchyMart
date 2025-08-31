@@ -4,6 +4,7 @@ const { Strategy } = require("passport-local");
 const Staff = require("../models/Staff");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
+const IS_PORD = require("../server")
 
 require("dotenv").config();
 
@@ -126,7 +127,7 @@ passport.deserializeUser(async (sessionUser, done) => {
 
 async function sendVerificationEmail(user, token) {
   let baseURL = "";
-  if (process.env.NODE_ENV === "production"){
+  if (IS_PORD){
     baseURL = process.env.BASE_URL
   }
   else{
