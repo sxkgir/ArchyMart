@@ -125,7 +125,14 @@ passport.deserializeUser(async (sessionUser, done) => {
 })
 
 async function sendVerificationEmail(user, token) {
-  const verifyUrl = `http://localhost:3000/api/auth/verify-email?token=${token}`;
+  let baseURL = "";
+  if (process.env.NODE_ENV === "production"){
+    baseURL = process.env.BASE_URL
+  }
+  else{
+    baseURL = "http://localhost:3000";
+  }
+  const verifyUrl = `${baseURL}/auth/verify-email?token=${token}`;
 
   const transporter = nodemailer.createTransport({
     service: "gmail",
