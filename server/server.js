@@ -4,39 +4,28 @@ const cors = require("cors");
 const session = require("express-session");
 const { connectDB } = require("./scripts/seed")
 const app = express();
-const port = 3000;
 const UserEntryRoutes = require("./routes/UserEntryRoutes");
 const OrderRoutes = require("./routes/OrderRoutes")
 const ProductRoutes = require("./routes/ProductRoutes")
 const passport = require("./strategies/LocalStrategy");
 const MongoStore = require("connect-mongo");
 
-app.set("trust proxy", 1);
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const ORIGIN =
-  process.env.NODE_ENV === "production"
-    ? "https://archymart.cs.rpi.edu"
-    : "http://localhost:5173";
+app.set('trust proxy', 1);
+
 
 // If you proxy /api via Nginx from the same origin (https://archymart.cs.rpi.edu),
 // you can REMOVE CORS entirely.
 // If you keep API on a different origin, keep this but set ORIGIN accordingly.
-if (process.env.NODE_ENV !== "production") {
-    console.log(ORIGIN)
-  app.use(
-    cors({
-      origin: ORIGIN,
-      credentials: true,
-    })
-  );
-}
+
+
+
 
 app.use(
     session({
-        secret: "ArchyMart Secret",
+        secret: process.env.SESSION_SECRET,
         saveUninitialized: false,  
         store: MongoStore.create({
             mongoUrl: process.env.MONGO_URI,
@@ -47,7 +36,7 @@ app.use(
             maxAge: 80000 * 100,   
             httpOnly: true,   
             //secure: process.env.NODE_ENV === "production",         
-            sameSite: "lax", 
+            //sameSite: "lax", 
         },
     })
 )
@@ -61,8 +50,8 @@ const HOST = process.env.NODE_ENV === "production" ? "127.0.0.1" : "0.0.0.0";
 
 connectDB()
     .then(() => {
-        app.listen(PORT,HOST, () => {
-            console.log(`Listening on ${HOST}:${port}`);
+        app.listen(PORT, HOST, () => {
+            console.log(`Listening on ${HOST}:${PORT}`);
         });
     })
     .catch((err) => {

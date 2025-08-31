@@ -4,7 +4,7 @@ import type { Status } from "../Types/Order";
 import type { CreateOrderDTO } from "../Types/Order";
 
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: "",
   withCredentials: true,
 });
 
@@ -14,7 +14,7 @@ const axiosInstance = axios.create({
 export const orderApi = {
 
     createOrder : async(orderData : CreateOrderDTO,studentRIN : number, formID: string | "" ) => {
-        const response = (await axiosInstance.post("/api/orders/create",{orderData, studentRIN, formID})).data
+        const response = (await axiosInstance.post("api/orders/create",{orderData, studentRIN, formID})).data
         return response
     },
 
