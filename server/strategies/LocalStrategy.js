@@ -4,7 +4,8 @@ const { Strategy } = require("passport-local");
 const Staff = require("../models/Staff");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
-const IS_PORD = require("../server")
+
+const IS_PROD = process.env.NODE_ENV === "production"
 
 require("dotenv").config();
 
@@ -18,11 +19,14 @@ passport.use(
       },
     async (req,email, RIN, done) => {
         try{
-           const student = await Student.findOne({ RIN });
+          const student = await Student.findOne({ RIN });
+
+          const LowerCaseEmail = email.toLowerCase();
+
           if (student == null){
             return done(null, false, { message: "RIN was not found, Please retype your RIN" });
           }
-          if (student.email !== email){
+          if (student.email !== LowerCaseEmail){
             return done(null, false, { message: "RIN does not match with email" });
           }
 
@@ -68,7 +72,9 @@ passport.use(
     },
     async(req,email,_unused,done)=>{
       try{
-        const staff = await Staff.findOne({email: email});
+        const LowerCaseEmail = email.toLowerCase();
+
+        const staff = await Staff.findOne({email: LowerCaseEmail});
 
         if(!staff){
           return done(null, false, {message: "Email of staff was not found, Please retype Email"})
@@ -127,7 +133,7 @@ passport.deserializeUser(async (sessionUser, done) => {
 
 async function sendVerificationEmail(user, token) {
   let baseURL = "";
-  if (IS_PORD){
+  if (IS_PROD){
     baseURL = process.env.BASE_URL
   }
   else{

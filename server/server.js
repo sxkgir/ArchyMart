@@ -10,7 +10,7 @@ const ProductRoutes = require("./routes/ProductRoutes")
 const passport = require("./strategies/LocalStrategy");
 const MongoStore = require("connect-mongo");
 
-const IS_PORD = process.env.NODE_ENV === "production";
+const IS_PROD = process.env.NODE_ENV === "production";
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -49,7 +49,7 @@ app.use(passport.session())
 const PORT = 3000;
 // Bind to 127.0.0.1 in prod (Nginx will proxy) ; 0.0.0.0 in dev if needed
 //0.0.0.0 binds server to all interfaces 127.0.0.1 LAN IPV etc
-const HOST = (IS_PORD) ? "127.0.0.1" : "0.0.0.0";
+const HOST = (IS_PROD) ? "127.0.0.1" : "0.0.0.0";
 
 connectDB()
     .then(() => {
@@ -67,5 +67,5 @@ app.use("/api/orders",OrderRoutes)
 
 app.use("/api/products",ProductRoutes)
 
-module.exports = {IS_PORD};
+module.exports = {IS_PROD};
 
