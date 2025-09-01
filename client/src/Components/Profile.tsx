@@ -84,13 +84,14 @@ export default function Profile() {
   const fullName = `${userInfo.firstName ?? ""} ${userInfo.lastName ?? ""}`.trim() || "User";
   const initials = `${userInfo.firstName?.[0] ?? ""}${userInfo.lastName?.[0] ?? ""}`.toUpperCase() || "U";
   const displayRIN =
-    (typeof userInfo.RIN === "string" && userInfo.RIN.trim().length > 0)
-      ? userInfo.RIN
+    (typeof userInfo.RIN === "number" && userInfo.RIN.toString().length > 0)
+      ? userInfo.RIN.toString()
       : "Not provided";
+
 
   return (
     <div className="h-full flex justify-center pt-[]">
-      <div className="bg-white rounded-2xl shadow p-6 md:p-8 max-w-3xl w-[50%] ">
+      <div className="bg-white rounded-2xl shadow p-6 md:p-8 max-w-3xl w-full md:w-[50%] ">
         <div className="flex items-start justify-between">
           <h2 className="text-2xl md:text-3xl font-bold">My Profile</h2>
         </div>

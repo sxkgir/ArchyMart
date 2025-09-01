@@ -10,185 +10,192 @@ import type { CartItem } from "../Types/Product";
 import SizeDropdown from "./UI/SizeDropDown";
 import { sizes } from "../api/productsApi";
 import { useOrderContext } from "../contexts/OrderProvider";
+export default function OrderContent() {
+  const { placeOrder, message } = useOrderContext();
+  const [searchInput, setSearchInput] = useState("");
+  const { getAllProducts } = useProductContext();
+  const [items, setItems] = useState<Product[]>([]); // local copy to render
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  const [activeHoverProductID, setActiveHoverProductID] = useState("");
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [orderSent, setOrderSent] = useState(false);
+  const [totalCartPrice, setTotalCartPrice] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [studentRIN, setStudentRIN] = useState(0);
+  const [showModal, setShowModal] = useState(false);
+  const [formID, setFormID] = useState("");
+  const [userRole, setUserRole] = useState("");
 
+  const [rinInput, setRinInput] = useState<string>(""); // holds what's typed
+  const [rinError, setRinError] = useState<string>("");
+  const [touched, setTouched] = useState(false);
 
-export default function OrderContent(){
-    const {placeOrder, message} = useOrderContext();
-    const [searchInput, setSearchInput] = useState("");
-    const { getAllProducts } = useProductContext();
-    const [items, setItems] = useState<Product[]>([]);            // local copy to render
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<Error | null>(null);    
-    const [activeHoverProductID, setActiveHoverProductID] = useState("");  
-    const [cartItems,setCartItems] = useState<CartItem[]>([]);
-    const [orderSent, setOrderSent] = useState(false); 
-    const [totalCartPrice, setTotalCartPrice] = useState(0);
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [studentRIN, setStudentRIN] = useState(0);
-    const [showModal, setShowModal] = useState(false);
-    const [formID, setFormID] = useState("");
-    const [userRole, setUserRole] = useState("");
-    
-    
-    const [rinInput, setRinInput] = useState<string>("");  // holds what's typed
-    const [rinError, setRinError] = useState<string>("");
-    const [touched, setTouched] = useState(false);
+  const isRinValid = /^\d{9}$/.test(rinInput); // validate the string
+  const showError = touched && !isRinValid;
 
-    const isRinValid = /^\d{9}$/.test(rinInput);  // validate the string
-    const showError = touched && !isRinValid;
-        // keep error in sync as user types
-    useEffect(() => {
+  // keep error in sync as user types
+  useEffect(() => {
     if (!touched) {
-        setRinError("");
-        return;
+      setRinError("");
+      return;
     }
     setRinError(isRinValid ? "" : "RIN must be exactly 9 digits");
-    }, [touched, isRinValid]);
+  }, [touched, isRinValid]);
 
+  // calculates total price of a cartItem not total cart
+  useEffect(() => {
+    const updated = cartItems.map((item) => {
+      if (item.sizeID !== null && !item.singleItem) {
+        const sizeObj = sizes.find((obj) => obj.sizeID === item.sizeID);
+        if (!sizeObj) return item;
 
-    //calculates total price of a cartItem not total cart
-    useEffect(() => {
+        const priceCalculation = Number(
+          (
+            (((sizeObj.sizeXInch * sizeObj.sizeYInch) / 144) *
+              (item.price / item.sqrFeet)) *
+            item.qty
+          ).toFixed(2)
+        );
+        console.log(priceCalculation);
+        return { ...item, totalPrice: priceCalculation };
+      }
 
-        const updated = cartItems.map((item) =>{
-            if (item.sizeID !== null && !item.singleItem){
-                const sizeObj = sizes.find(obj => obj.sizeID === item.sizeID);
-                if (!sizeObj)
-                    return item;
+      if (item.singleItem) {
+        return {
+          ...item,
+          totalPrice: Number((item.price * item.qty).toFixed(2)),
+        };
+      }
 
-                
-                const priceCalculation = Number(((((sizeObj.sizeXInch * sizeObj.sizeYInch) / 144)*(item.price / item.sqrFeet))*item.qty).toFixed(2));
-                console.log(priceCalculation);
-                return {...item, totalPrice: priceCalculation};
-            }
-            if (item.singleItem) {
-                return {
-                ...item,
-                totalPrice: Number((item.price * item.qty).toFixed(2))
-                };
-            }
-             
-            return item //returns the array of cartItems if it sizeID is null
-        })
-
-        const hasChanges = updated.some((u, i) => u !== cartItems[i]);
-
-        if (hasChanges) {
-            setCartItems(updated);
-        }
-
-        const total = updated.reduce((sum, item) => {
-            if (item.totalPrice === undefined || item.totalPrice === null) return sum;
-            return sum + item.totalPrice;
-        }, 0);
-        setTotalCartPrice(Number(total.toFixed(2)));
-
-    },[JSON.stringify(cartItems.map(i => ({ id: i.productID, sizeID: i.sizeID, quantity: i.qty, total: i.totalPrice }))),])
-
-    //cartReady is always in sync, because it's derived directly from the current state
-    const cartReady = cartItems.length > 0 && cartItems.every(item =>
-    item.singleItem || (item.totalPrice !== undefined)
-    );
-
-    const buildCartItem = (p: Product): CartItem => ({
-        _id: Date.now(),                 // or any unique id you use
-        productID: p.productID,
-        productName: p.productName,
-        categoryName: p.categoryName,
-        price: p.price,
-        singleItem: p.singleItem,
-        availability: p.availability,
-        sqrFeet: p.sqrFeet,
-        qty: 1,
-        sizeID: null,                    // no size selected yet
-        totalPrice: p.singleItem ? p.price : 0 // effect will recalc later for sheet goods
+      return item; // returns the array of cartItems if it sizeID is null
     });
-    
-    const handleAddCart = () => {
-        if (!activeHoverProductID) return;
 
-        const product = items.find(p => p.productID === activeHoverProductID);
-        if (!product) return;
-        
-        setCartItems(prev => {
-            const idx = prev.findIndex(c => c.productID === product.productID);
-            if (idx !== -1) {
-            // return a proper CartItem[] (no unions)
-            const next = [...prev];
-            const existing = next[idx];
-            const updated: CartItem = { ...existing, qty: existing.qty + 1 };
-            next[idx] = updated;
-            return next;
-            }
-            // add a fully-typed CartItem
-            return [...prev, buildCartItem(product)];
-        });
-
-        setActiveHoverProductID("");
-    };
-
-    const handlePlaceOrder = async() =>{
-        try{
-            try{
-                setIsSubmitting(true);
-                await placeOrder(
-                //parameter destructuring. It extracts these properties from each cartItem object automatically. It
-                cartItems.map(({productID,productName,categoryName,qty,price,totalPrice})=>({
-                    productID,
-                    productName,
-                    unitPrice: price,
-                    category: categoryName,
-                    qty,
-                    totalPrice,
-                })),
-                totalCartPrice,
-                studentRIN,
-                formID
-                );
-
-            }
-            finally{
-                setIsSubmitting(false);
-                setOrderSent(true);
-                setShowModal(true);
-                setCartItems([]);
-                setStudentRIN(0)
-                setRinInput("");
-            }
-
-        }
-        catch(error){
-            console.error("Order failed:", error);
-        }
+    const hasChanges = updated.some((u, i) => u !== cartItems[i]);
+    if (hasChanges) {
+      setCartItems(updated);
     }
 
+    const total = updated.reduce((sum, item) => {
+      if (item.totalPrice === undefined || item.totalPrice === null) return sum;
+      return sum + item.totalPrice;
+    }, 0);
 
+    setTotalCartPrice(Number(total.toFixed(2)));
+  }, [
+    JSON.stringify(
+      cartItems.map((i) => ({
+        id: i.productID,
+        sizeID: i.sizeID,
+        quantity: i.qty,
+        total: i.totalPrice,
+      }))
+    ),
+  ]);
 
-    useEffect(() => {
-    (async () => {              
-        try{
-            const data = await getAllProducts();
-            setItems(data.products);
-            setUserRole(data.role);
-        }
-        catch (err) {
-            console.log(error)
-            setError(err as Error);  
-        }
-        finally {
-            setLoading(false);
-        }
-        {} []
-    })();                      
-    }, [getAllProducts]);
+  // cartReady is always in sync, because it's derived directly from the current state
+const cartReady =
+  cartItems.length > 0 &&
+  cartItems.every((item) => item.singleItem || item.sizeID != null);
+  const buildCartItem = (p: Product): CartItem => ({
+    _id: Date.now(), // or any unique id you use
+    productID: p.productID,
+    productName: p.productName,
+    categoryName: p.categoryName,
+    price: p.price,
+    singleItem: p.singleItem,
+    availability: p.availability,
+    sqrFeet: p.sqrFeet,
+    qty: 1,
+    sizeID: null, // no size selected yet
+    totalPrice: p.singleItem ? p.price : 0, // effect will recalc later for sheet goods
+  });
 
-    const filtered = items.filter((item) => item.availability && 
-                                            item.productName.toLowerCase().includes(searchInput.toLowerCase()))
+  const handleAddCart = () => {
+    if (!activeHoverProductID) return;
 
-    console.log(items.map((p) => p.productName))
-    useEffect(()=> {console.log(orderSent)},[orderSent])
+    const product = items.find((p) => p.productID === activeHoverProductID);
+    if (!product) return;
 
+    setCartItems((prev) => {
+      const idx = prev.findIndex((c) => c.productID === product.productID);
+      if (idx !== -1) {
+        // return a proper CartItem[] (no unions)
+        const next = [...prev];
+        const existing = next[idx];
+        const updated: CartItem = { ...existing, qty: existing.qty + 1 };
+        next[idx] = updated;
+        return next;
+      }
+      // add a fully-typed CartItem
+      return [...prev, buildCartItem(product)];
+    });
+
+    setActiveHoverProductID("");
+  };
+
+  const handlePlaceOrder = async () => {
+    try {
+      try {
+        setIsSubmitting(true);
+        await placeOrder(
+          // parameter destructuring: extracts these properties from each cartItem
+          cartItems.map(
+            ({ productID, productName, categoryName, qty, price, totalPrice }) => ({
+              productID,
+              productName,
+              unitPrice: price,
+              category: categoryName,
+              qty,
+              totalPrice,
+            })
+          ),
+          totalCartPrice,
+          studentRIN,
+          formID
+        );
+      } finally {
+        setIsSubmitting(false);
+        setOrderSent(true);
+        setShowModal(true);
+        setCartItems([]);
+        setStudentRIN(0);
+        setRinInput("");
+      }
+    } catch (error) {
+      console.error("Order failed:", error);
+    }
+  };
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await getAllProducts();
+        setItems(data.products);
+        setUserRole(data.role);
+      } catch (err) {
+        console.log(error);
+        setError(err as Error);
+      } finally {
+        setLoading(false);
+      }
+      {} [];
+    })();
+  }, [getAllProducts]);
+
+  const filtered = items.filter(
+    (item) =>
+      item.availability &&
+      item.productName.toLowerCase().includes(searchInput.toLowerCase())
+  );
+
+  console.log(items.map((p) => p.productName));
+
+  useEffect(() => {
+    console.log(orderSent);
+  }, [orderSent]);
     return( 
-        <div className="">
+        <div className="pt-6 md:pt-0">
             {userRole === "staff" &&
                 <div className="mb-6">
                     <b className="flex justify-center">Staff Order For Students</b>
@@ -272,96 +279,100 @@ export default function OrderContent(){
                     
                 </div>
 
-                <div className="flex flex-col border-2 rounded-3xl w-full h-auto md:w-[85%] md:h-[650px] ">
+                <div className="flex flex-col border-2 rounded-3xl w-full h-auto md:w-[85%] md:h-[650px]">
                     <p className="text-center font-extrabold text-xl mb-3">Shopping Cart</p>
 
+                    {/* One shared X-scroll wrapper */}
                     <div className="overflow-x-auto md:overflow-visible">
-                        <div className="min-w-[720px] grid grid-cols-[1.8fr_0.9fr_0.6fr_0.9fr_0.7fr_0.7fr_40px] items-center pl-4 pr-4 text-gray-500 font-bold text-[0.9rem] gap-2 md:min-w-0">
-                        <p>Product</p>
-                        <p>Category</p>
-                        <p>Price</p>
-                        <p>Size</p>
-                        <p className="text-center">Qty</p>
-                        <p className="text-center">Total</p>
-                        <p className="text-center">Action</p>
-                        </div>
-                    </div>
-                    <div className={"border-t-black border-t-2 overflow-y-auto w-full h-[70%] mt-[1%] pb-[2%] overflow-x-auto" + (loading ? " flex items-center justify-center" : "")} >
                         <div className="min-w-[720px] md:min-w-0">
-                            {loading && <Load className="w-35 h-35 " />}
-                            
-                            {!loading && !error && cartItems.map((c) => ( 
-                                <div
+                        {/* Header: sticky only on mobile */}
+                        <div className="grid grid-cols-[1.8fr_0.9fr_0.6fr_0.9fr_0.7fr_0.7fr_40px]
+                                        items-center gap-2 pl-4 pr-4 text-gray-500 font-bold text-[0.9rem]
+                                        sticky top-0 bg-white z-10 md:static">
+                            <p>Product</p>
+                            <p>Category</p>
+                            <p>Price</p>
+                            <p>Size</p>
+                            <p className="text-center">Qty</p>
+                            <p className="text-center">Total</p>
+                            <p className="text-center">Action</p>
+                        </div>
+
+                        {/* Body: vertical scroll only; inherits the same horizontal scroll */}
+                        <div
+                            className={
+                            "border-t-black border-t-2 w-full mt-[1%] pb-[2%] overflow-y-auto " +
+                            (loading ? "flex items-center justify-center " : "") +
+                            "max-h-[40vh] md:max-h-[40vh]"
+                            }
+                        >
+                            {loading && <Load className="w-35 h-35" />}
+
+                            {!loading && !error && cartItems.map((c) => (
+                            <div
                                 key={c.productID}
                                 className="grid grid-cols-[1.8fr_0.9fr_0.6fr_0.9fr_0.7fr_0.7fr_40px]
-                                            items-center gap-2 pl-4 pr-4 mt-3 text-[0.9rem]"
-                                >
-                                    <p className="truncate">{c.productName}</p>
-                                    <p className="truncate">{c.categoryName}</p>
-                                    <p>${c.price}</p>
+                                        items-center gap-2 pl-4 pr-4 mt-3 text-[0.9rem]"
+                            >
+                                <p className="truncate">{c.productName}</p>
+                                <p className="truncate">{c.categoryName}</p>
+                                <p>${c.price}</p>
 
-                                    <div className="min-w-0">
-                                        {c.categoryName === "Sheet good" && (
-                                        <SizeDropdown
-                                            selectedID={c.sizeID ?? null}
-                                            onChange={(newID) => {
-                                            setCartItems(prev =>
-                                                prev.map(item =>
-                                                item.productID === c.productID ? { ...item, sizeID: newID } : item
-                                                )
-                                            );
-                                            }}
-                                        />
-                                        )}
-                                    </div>
-
-                                    <div className="flex items-center justify-center">
-                                        <input
-                                        type="number"
-                                        min={1}
-                                        value={c.qty}
-                                        onChange={(e) => {
-                                            const newQty = Math.max(1, parseInt(e.target.value) || 1);
-                                            setCartItems(prev =>
-                                            prev.map(item =>
-                                                item.productID === c.productID ? { ...item, qty: newQty } : item
-                                            )
-                                            );
-                                        }}
-                                        className="w-12 text-center border rounded"
-                                        />
-                                    </div>
-
-                                    <p className="text-center">${c.totalPrice}</p>
-                                    {/* Actions column */}
-                                    <button
-                                        type="button"
-                                        aria-label={`Remove ${c.productName}`}
-                                        onClick={() =>
-                                        setCartItems(prev => prev.filter(item => item.productID !== c.productID))
-                                        }
-                                        className="h-8 w-8 rounded-md border hover:bg-red-600 hover:text-white 
-                                                flex items-center justify-center"
-                                    >
-                                        ✕
-                                    </button>
+                                <div className="min-w-0">
+                                {c.categoryName === "Sheet good" && (
+                                    <SizeDropdown
+                                    selectedID={c.sizeID ?? null}
+                                    onChange={(newID) => {
+                                        setCartItems(prev =>
+                                        prev.map(item =>
+                                            item.productID === c.productID ? { ...item, sizeID: newID } : item
+                                        )
+                                        );
+                                    }}
+                                    />
+                                )}
                                 </div>
-                                
+
+                                <div className="flex items-center justify-center">
+                                <input
+                                    type="number"
+                                    min={1}
+                                    value={c.qty}
+                                    onChange={(e) => {
+                                    const newQty = Math.max(1, parseInt(e.target.value) || 1);
+                                    setCartItems(prev =>
+                                        prev.map(item =>
+                                        item.productID === c.productID ? { ...item, qty: newQty } : item
+                                        )
+                                    );
+                                    }}
+                                    className="w-12 text-center border rounded"
+                                />
+                                </div>
+
+                                <p className="text-center">${c.totalPrice}</p>
+
+                                <button
+                                type="button"
+                                aria-label={`Remove ${c.productName}`}
+                                onClick={() =>
+                                    setCartItems(prev => prev.filter(item => item.productID !== c.productID))
+                                }
+                                className="h-8 w-8 rounded-md border hover:bg-red-600 hover:text-white flex items-center justify-center"
+                                >
+                                ✕
+                                </button>
+                            </div>
                             ))}
-                            
-                            {!loading && error && (
-                                <p>
-                                    {error.message}
-                                </p>
-                            )} 
 
-                        </div>    
+                            {!loading && error && <p>{error.message}</p>}
+                        </div>
                     </div>
-                    <div className="text-center mt-3">
-                        Total Price: ${totalCartPrice}
-                    </div>
+                </div>
 
-                    <div className="w-full flex justify-center relative group">
+                    <div className="text-center mt-3">Total Price: ${totalCartPrice}</div>
+
+                    <div className="w-full flex justify-center relative group mt-auto mb-2 md:mb-6">
                         <button
                             type="button"
                             disabled={!cartReady || isSubmitting || (!isRinValid && userRole === "staff")}

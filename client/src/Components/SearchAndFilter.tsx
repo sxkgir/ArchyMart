@@ -71,7 +71,7 @@ export default function SearchAndFilter({
         {/* Search input */}
         <div className="relative w-[100%]">
             <input
-            className="border rounded-[9px] h-full w-full pl-[1.5%] text-[14px]"
+            className="border rounded-[9px] h-full w-full pl-[1.5%] text-[0.62rem] md:text-[0.9rem]"
             placeholder={role ==="staff" ? "Search by Order ID (ORD-...), Student Name, Student Email, FormID" 
                                          : "Search by Order ID Only (ORD-...), FormID"}
             value={value}

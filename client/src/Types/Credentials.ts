@@ -6,7 +6,7 @@ export interface studentLogin{
 export type UserInfo = {
     firstName: string;
     lastName: string;
-    RIN?: string;
+    RIN?: number;
     email: string;
     role: string;
 }
