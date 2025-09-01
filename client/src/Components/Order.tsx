@@ -190,10 +190,10 @@ export default function OrderContent(){
     return( 
         <div className="">
             {userRole === "staff" &&
-                <div>
+                <div className="mb-6">
                     <b className="flex justify-center">Staff Order For Students</b>
-                    <div className="flex gap-[10%] pt-6 justify-center">
-                        <div className="flex w-[25%] flex-col text-left">
+                    <div className="flex flex-col gap-2 md:flex-row md:gap-[10%] pt-6 justify-center">
+                        <div className="flex w-full md:w-[25%] flex-col text-left">
                             <label className="text-sm font-medium mb-1 text-gray-800">Student RIN</label>
                             <input
                                 type="text"
@@ -219,9 +219,9 @@ export default function OrderContent(){
                                 <span className="text-xs text-red-500 mt-1">RIN must be exactly 9 digits</span>
                             )}
                         </div>
-                        <div className="flex flex-col w-[25%]">
+                        <div className="flex flex-col w-full md:w-[25%]">
                             <label className="text-sm font-medium mb-1 text-gray-800">
-                            formID
+                            FormID
                             </label>
                             <input
                                 type="text"
@@ -235,10 +235,10 @@ export default function OrderContent(){
 
                 </div>
             }
-            <div className="flex gap-[6%] pt-[3%] items-center">        
+            <div className="flex flex-col gap-4 items-stretch md:flex-row md:gap-[6%] md:pt-[3%] md:items-center">        
                 {showModal && <MessageModal message={message} onClose={() => setShowModal(false)}/>}
-                <div className=" pl-[3%] flex flex-col items-center w-[41%]">
-                    <div className="relative w-[60%]"> {/* controls total width */}
+                <div className="flex flex-col items-center w-full md:w-[41%] md:pl-[3%] ">
+                    <div className="relative w-full md:w-[60%]"> {/* controls total width */}
                         <input
                         className="border-2 rounded-2xl outline-0 px-3 pr-10 w-full h-10"
                         value={searchInput}
@@ -247,7 +247,7 @@ export default function OrderContent(){
                         />
                         <Search className="w-5 h-5 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
                     </div>
-                    <div className={"border-2 overflow-y-auto w-[100%] h-[450px] mt-5 " + (loading ? " flex items-center justify-center" : "")} >
+                    <div className={"border-2 overflow-y-auto w-[100%] h-78 md:h-[450px] mt-5 " + (loading ? " flex items-center justify-center" : "")} >
                         {loading && <Load className="w-35 h-35 " />}
                         
                         {!loading && !error && filtered.map((p) => ( 
@@ -272,88 +272,92 @@ export default function OrderContent(){
                     
                 </div>
 
-                <div className="border-2 rounded-3xl w-[85%] h-[650px] flex flex-col ">
+                <div className="flex flex-col border-2 rounded-3xl w-full h-auto md:w-[85%] md:h-[650px] ">
                     <p className="text-center font-extrabold text-xl mb-3">Shopping Cart</p>
-                    <div className="grid grid-cols-[1.8fr_0.9fr_0.6fr_0.9fr_0.7fr_0.7fr_40px] 
-                                    items-center pl-4 pr-4 text-gray-500 font-bold text-[0.9rem] gap-2">
+
+                    <div className="overflow-x-auto md:overflow-visible">
+                        <div className="min-w-[720px] grid grid-cols-[1.8fr_0.9fr_0.6fr_0.9fr_0.7fr_0.7fr_40px] items-center pl-4 pr-4 text-gray-500 font-bold text-[0.9rem] gap-2 md:min-w-0">
                         <p>Product</p>
                         <p>Category</p>
                         <p>Price</p>
                         <p>Size</p>
                         <p className="text-center">Qty</p>
                         <p className="text-center">Total</p>
-                        <p className="text-center">Action </p> {}
+                        <p className="text-center">Action</p>
+                        </div>
                     </div>
-                    <div className={"border-t-black border-t-2 overflow-y-auto w-[100%] h-[70%] mt-[1%] pb-[2%]" + (loading ? " flex items-center justify-center" : "")} >
-                        {loading && <Load className="w-35 h-35 " />}
-                        
-                        {!loading && !error && cartItems.map((c) => ( 
-                            <div
-                            key={c.productID}
-                            className="grid grid-cols-[1.8fr_0.9fr_0.6fr_0.9fr_0.7fr_0.7fr_40px]
-                                        items-center gap-2 pl-4 pr-4 mt-3 text-[0.9rem]"
-                            >
-                                <p className="truncate">{c.productName}</p>
-                                <p className="truncate">{c.categoryName}</p>
-                                <p>${c.price}</p>
-
-                                <div className="min-w-0">
-                                    {c.categoryName === "Sheet good" && (
-                                    <SizeDropdown
-                                        selectedID={c.sizeID ?? null}
-                                        onChange={(newID) => {
-                                        setCartItems(prev =>
-                                            prev.map(item =>
-                                            item.productID === c.productID ? { ...item, sizeID: newID } : item
-                                            )
-                                        );
-                                        }}
-                                    />
-                                    )}
-                                </div>
-
-                                <div className="flex items-center justify-center">
-                                    <input
-                                    type="number"
-                                    min={1}
-                                    value={c.qty}
-                                    onChange={(e) => {
-                                        const newQty = Math.max(1, parseInt(e.target.value) || 1);
-                                        setCartItems(prev =>
-                                        prev.map(item =>
-                                            item.productID === c.productID ? { ...item, qty: newQty } : item
-                                        )
-                                        );
-                                    }}
-                                    className="w-12 text-center border rounded"
-                                    />
-                                </div>
-
-                                <p className="text-center">${c.totalPrice}</p>
-                                {/* Actions column */}
-                                <button
-                                    type="button"
-                                    aria-label={`Remove ${c.productName}`}
-                                    onClick={() =>
-                                    setCartItems(prev => prev.filter(item => item.productID !== c.productID))
-                                    }
-                                    className="h-8 w-8 rounded-md border hover:bg-red-600 hover:text-white 
-                                            flex items-center justify-center"
-                                >
-                                    ✕
-                                </button>
-                            </div>
+                    <div className={"border-t-black border-t-2 overflow-y-auto w-full h-[70%] mt-[1%] pb-[2%] overflow-x-auto" + (loading ? " flex items-center justify-center" : "")} >
+                        <div className="min-w-[720px] md:min-w-0">
+                            {loading && <Load className="w-35 h-35 " />}
                             
-                        ))}
-                        
-                        {!loading && error && (
-                            <p>
-                                {error.message}
-                            </p>
-                        )} 
+                            {!loading && !error && cartItems.map((c) => ( 
+                                <div
+                                key={c.productID}
+                                className="grid grid-cols-[1.8fr_0.9fr_0.6fr_0.9fr_0.7fr_0.7fr_40px]
+                                            items-center gap-2 pl-4 pr-4 mt-3 text-[0.9rem]"
+                                >
+                                    <p className="truncate">{c.productName}</p>
+                                    <p className="truncate">{c.categoryName}</p>
+                                    <p>${c.price}</p>
 
-                    </div>    
-                    <div className="text-center">
+                                    <div className="min-w-0">
+                                        {c.categoryName === "Sheet good" && (
+                                        <SizeDropdown
+                                            selectedID={c.sizeID ?? null}
+                                            onChange={(newID) => {
+                                            setCartItems(prev =>
+                                                prev.map(item =>
+                                                item.productID === c.productID ? { ...item, sizeID: newID } : item
+                                                )
+                                            );
+                                            }}
+                                        />
+                                        )}
+                                    </div>
+
+                                    <div className="flex items-center justify-center">
+                                        <input
+                                        type="number"
+                                        min={1}
+                                        value={c.qty}
+                                        onChange={(e) => {
+                                            const newQty = Math.max(1, parseInt(e.target.value) || 1);
+                                            setCartItems(prev =>
+                                            prev.map(item =>
+                                                item.productID === c.productID ? { ...item, qty: newQty } : item
+                                            )
+                                            );
+                                        }}
+                                        className="w-12 text-center border rounded"
+                                        />
+                                    </div>
+
+                                    <p className="text-center">${c.totalPrice}</p>
+                                    {/* Actions column */}
+                                    <button
+                                        type="button"
+                                        aria-label={`Remove ${c.productName}`}
+                                        onClick={() =>
+                                        setCartItems(prev => prev.filter(item => item.productID !== c.productID))
+                                        }
+                                        className="h-8 w-8 rounded-md border hover:bg-red-600 hover:text-white 
+                                                flex items-center justify-center"
+                                    >
+                                        ✕
+                                    </button>
+                                </div>
+                                
+                            ))}
+                            
+                            {!loading && error && (
+                                <p>
+                                    {error.message}
+                                </p>
+                            )} 
+
+                        </div>    
+                    </div>
+                    <div className="text-center mt-3">
                         Total Price: ${totalCartPrice}
                     </div>
 
