@@ -36,12 +36,6 @@ export default function LoginPage() {
             >
               Log in for Architecture Students
             </Link>
-            <Link
-              to="/login/guest"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
-            >
-              Log in for Non-Architecture Students
-            </Link>
           </div>
         </div>
         <div className="bg-gray-900 text-gray-500 text-center py-3 text-sm">
